@@ -1,26 +1,50 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Route } from 'react-router-dom';
 import './App.css';
+import MonList from './pokemon/monlist';
+import Mon from './pokemon/mon'
 
-function App() {
+export default class App extends React.Component {
+  state = {
+    results: []
+  }
+  componentDidMount() {
+    fetch('https://pokeapi.co/api/v2/pokemon')
+      .then(res => res.json())
+      .then(data => {
+        this.setState({results: [...data.results]})
+      })
+  }
+
+  render() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+      <header>
+        <h1>PokeList</h1>
       </header>
+      <Route
+        exact path="/" 
+        render={routerProps => {
+          return ( 
+            <MonList
+              monsters={this.state.results}
+              routerProps={routerProps} 
+            />
+          )
+        }}
+      />
+      <Route 
+        path="/:id" 
+        render={({match, location, history}) => {
+          return <Mon 
+            match={match}
+            location={location}
+            history={history}
+            monsters={this.state.results}
+        />
+      }}
+      />
     </div>
   );
+  }
 }
-
-export default App;
